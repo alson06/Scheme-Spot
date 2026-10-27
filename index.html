@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheme Spot | Discover National & State Welfare Schemes</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bubbles.css">
+  
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Background Ambience & Soft Civic Watermark -->
+  <canvas id="bubbleCanvas"></canvas>
+  <div class="ambient-glow"></div>
+  <div class="civic-grid-overlay"></div>
+  <div class="civic-watermark-container">
+    <svg class="civic-watermark-svg" viewBox="0 0 200 200" fill="none" stroke="#2563eb" stroke-width="1.5">
+      <circle cx="100" cy="100" r="90"/>
+      <circle cx="100" cy="100" r="22"/>
+      <g stroke-width="1">
+        <line x1="100" y1="10" x2="100" y2="190"/>
+        <line x1="10" y1="100" x2="190" y2="100"/>
+        <line x1="36.36" y1="36.36" x2="163.64" y2="163.64"/>
+        <line x1="36.36" y1="163.64" x2="163.64" y2="36.36"/>
+        <line x1="65.36" y1="13.4" x2="134.64" y2="186.6"/>
+        <line x1="13.4" y1="65.36" x2="186.6" y2="134.64"/>
+        <line x1="134.64" y1="13.4" x2="65.36" y2="186.6"/>
+        <line x1="13.4" y1="134.64" x2="186.6" y2="65.36"/>
+        <line x1="81.7" y1="11.4" x2="118.3" y2="188.6"/>
+        <line x1="11.4" y1="81.7" x2="188.6" y2="118.3"/>
+        <line x1="118.3" y1="11.4" x2="81.7" y2="188.6"/>
+        <line x1="11.4" y1="118.3" x2="188.6" y2="81.7"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="relative-content">
+    
+    <!-- Top Navigation Bar -->
+    <header>
+      <nav class="navbar">
+        <a href="#" class="brand" onclick="showCitizenView()">
+          <!-- Secret trigger: Triple-clicking this flag opens admin login -->
+          <span class="brand-badge" id="secretLogoTrigger" title="Scheme Spot" style="cursor: pointer; user-select: none;">🇮🇳</span>
+          Scheme Spot
+        </a>
+        
+        <div class="nav-user-badge">
+          <!-- Language Selector -->
+          <div style="display: flex; align-items: center; gap: 0.35rem; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.25rem 0.6rem;">
+            <span style="font-size: 0.9rem;">🌐</span>
+            <select id="langSelect" style="background: transparent; border: none; font-size: 0.85rem; font-weight: 600; color: var(--text-main); cursor: pointer; outline: none;">
+              <option value="en">English</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="ml">മലയാളം (Malayalam)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-outline" id="feedbackNavBtn" onclick="openFeedbackModal()" style="font-size: 0.85rem; padding: 0.45rem 0.9rem;">
+            💬 Feedback / Report
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- VIEW 1: PUBLIC CITIZEN DASHBOARD -->
+    <main id="citizenDashboardView">
+      <section class="hero">
+        <span class="hero-pill" id="heroPill">✨ Open Welfare Discovery Platform</span>
+        <h1 id="heroTitle">Find Every Scheme You Deserve</h1>
+        <p id="heroSubtitle">A unified portal discovering national scholarships, educational grants, farming subsidies, and business support schemes.</p>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search by scheme name, ministry, or keyword (e.g. PMIS, Scholarship, Kisan)..."
+          >
+        </div>
+      </section>
+
+      <!-- One-Time Personalization Card -->
+      <section style="max-width: 1240px; margin: 0 auto 2rem; padding: 0 1.5rem;">
+        <div id="profileSummaryBanner" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 1rem 1.5rem; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: #1e40af;" id="matchActiveLabel">🎯 Personalized Match Active:</strong>
+            <span id="profileSummaryText" style="color: #3b82f6; margin-left: 0.5rem; font-size: 0.9rem;"></span>
+          </div>
+          <div>
+            <button class="btn btn-outline" id="changeDetailsBtn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: #fff;" onclick="openProfileModal()">Change Details</button>
+            <button class="btn btn-outline" id="resetProfileBtn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: #fff; margin-left: 0.3rem;" onclick="clearProfilePreferences()">Reset</button>
+          </div>
+        </div>
+
+        <div id="profileSetupPrompt" style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+          <div>
+            <h4 style="color: #0f172a; margin-bottom: 0.2rem;" id="profilePromptTitle">⚡ Check Exact Eligibility (One-Time Setup)</h4>
+            <p style="color: #64748b; font-size: 0.88rem;" id="profilePromptSubtitle">Set your Age, Occupation, Caste category, and Annual Income once to filter eligible benefits instantly.</p>
+          </div>
+          <button class="btn btn-primary" id="personalizeBtn" onclick="openProfileModal()">
+            Personalize My Feed 🎯
+          </button>
+        </div>
+      </section>
+
+      <!-- Category & State Filter Bar -->
+      <section class="filters-bar">
+        <div class="filter-group">
+          <button class="chip-btn active" data-category="All" id="chipAll">All Categories</button>
+          <button class="chip-btn" data-category="Students" id="chipStudents">🎓 Students & Youth</button>
+          <button class="chip-btn" data-category="Women" id="chipWomen">👩 Women</button>
+          <button class="chip-btn" data-category="Farmers" id="chipFarmers">🌾 Farmers</button>
+          <button class="chip-btn" data-category="Entrepreneurs" id="chipBiz">💼 MSME / Business</button>
+        </div>
+
+        <div class="filter-group">
+          <select id="stateSelect" class="select-filter">
+            <option value="" id="optAllStates">All States & UTs</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Telangana">Telangana</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Punjab">Punjab</option>
+            <option value="West Bengal">West Bengal</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Schemes Cards Grid -->
+      <section class="schemes-section">
+        <div class="section-header">
+          <h2><span id="availableSchemesLabel">Available Schemes</span> (<span id="schemeCount">0</span>)</h2>
+        </div>
+        <div class="schemes-grid" id="schemesGrid">
+          <!-- Populated dynamically by app.js -->
+        </div>
+
+        <!-- Numeric Pagination Bar -->
+        <div class="pagination-container" id="paginationBar">
+          <!-- Generated dynamically by app.js -->
+        </div>
+      </section>
+
+      <!-- Citizen Footer -->
+      <footer style="text-align: center; padding: 3rem 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.88rem;">
+        <p id="footerText">Scheme Spot • National & State Public Service Portal</p>
+      </footer>
+    </main>
+
+    <!-- VIEW 2: SUPERVISORY ADMIN MONITORING CONSOLE -->
+    <div id="adminDashboardView" style="display: none;">
+      <div class="admin-container">
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1>Supervisory Admin Console</h1>
+            <p style="color: var(--text-muted);">Monitor citizen traffic, review incoming feedback & reports, and manage scheme records.</p>
+          </div>
+          <button class="btn btn-outline" onclick="exitAdminView()">Exit Admin Mode ✕</button>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="admin-stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">TOTAL UNIQUE VISITORS</div>
+            <div class="stat-number" id="statVisitors">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ACTIVE SCHEMES IN DB</div>
+            <div class="stat-number" id="statSchemes">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">CITIZEN FEEDBACK & REPORTS</div>
+            <div class="stat-number" id="statFeedbacks">0</div>
+          </div>
+        </div>
+
+        <!-- Feedback Table -->
+        <div class="admin-box">
+          <div class="admin-box-title">
+            <span>📩 Citizen Feedback & Issue Reports</span>
+          </div>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Citizen Info</th>
+                  <th>Subject & Details</th>
+                  <th>Received At</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminFeedbacksTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add Scheme Form -->
+        <div class="admin-box">
+          <div class="admin-box-title">
+            <span>➕ Publish New Scheme to Database</span>
+          </div>
+          <form id="addSchemeForm">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+              <div class="form-group">
+                <label>Scheme Title</label>
+                <input type="text" id="schTitle" class="form-control" required placeholder="e.g. Free Laptop Distribution Scheme">
+              </div>
+              <div class="form-group">
+                <label>Level</label>
+                <select id="schLevel" class="form-control" required>
+                  <option value="Central">Central</option>
+                  <option value="State">State</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Target State</label>
+                <select id="schState" class="form-control" required>
+                  <option value="All India">All India</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Delhi">Delhi</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select id="schCategory" class="form-control" required>
+                  <option value="Students">Students</option>
+                  <option value="Women">Women</option>
+                  <option value="Farmers">Farmers</option>
+                  <option value="Entrepreneurs">Entrepreneurs</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Applicable Caste Quota</label>
+                <select id="schCaste" class="form-control" required>
+                  <option value="All">All Categories / General</option>
+                  <option value="SC/ST/OBC">SC / ST / OBC</option>
+                  <option value="Minority">Minority Communities</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Max Annual Income Limit (₹)</label>
+                <input type="number" id="schMaxIncome" class="form-control" placeholder="9999999 for No Limit" value="9999999">
+              </div>
+              <div class="form-group">
+                <label>Ministry / Department</label>
+                <input type="text" id="schMinistry" class="form-control" required placeholder="e.g. Dept of Higher Education">
+              </div>
+              <div class="form-group">
+                <label>Official Portal Link (URL)</label>
+                <input type="url" id="schUrl" class="form-control" required placeholder="https://scheme.gov.in">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Direct Benefits</label>
+              <input type="text" id="schBenefits" class="form-control" required placeholder="e.g. ₹10,000 allowance per year">
+            </div>
+            <div class="form-group">
+              <label>Objective & Summary</label>
+              <textarea id="schSummary" class="form-control" rows="3" required placeholder="Brief description of eligibility criteria and benefits..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Save & Publish Scheme
+            </button>
+          </form>
+        </div>
+
+        <!-- Scheme Directory Table -->
+        <div class="admin-box">
+          <div class="admin-box-title">
+            <span>⚙️ Current Scheme Directory</span>
+          </div>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Scheme Name</th>
+                  <th>Jurisdiction</th>
+                  <th>Category</th>
+                  <th>Caste / Income Criteria</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminSchemesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- MODAL 1: Admin Login Gate -->
+  <div class="modal-overlay" id="adminLoginModal">
+    <div class="modal-window eligibility-modal-box">
+      <button class="close-btn" onclick="closeAdminLoginModal()">&times;</button>
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <span class="auth-badge" style="font-size: 1.2rem;">🛡️</span>
+        <h2 style="margin-top: 0.5rem;">Admin Verification</h2>
+        <p class="modal-subtext">Restricted access for portal supervisors.</p>
+      </div>
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label for="adminUsernameInput">Username</label>
+          <input type="text" id="adminUsernameInput" class="form-control" required placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label for="adminPasswordInput">Password</label>
+          <input type="password" id="adminPasswordInput" class="form-control" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Verify Credentials</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: One-Time Personalization Modal -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-window eligibility-modal-box">
+      <button class="close-btn" onclick="closeProfileModal()">&times;</button>
+      <h2 id="profileModalTitle">Personalize Welfare Feed</h2>
+      <p class="modal-subtext" id="profileModalSub">These details are stored safely in your browser so you only enter them once.</p>
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="userAge" id="lblAge">Your Age</label>
+          <input type="number" id="userAge" class="form-control" required min="10" max="100" value="20">
+        </div>
+        <div class="form-group">
+          <label for="userOccupation" id="lblOccupation">Occupation / Current Role</label>
+          <select id="userOccupation" class="form-control" required>
+            <option value="Students">College Student / Recent Graduate</option>
+            <option value="Women">Women Seeking Support / Employment</option>
+            <option value="Farmers">Farmer / Agriculturalist</option>
+            <option value="Entrepreneurs">Small Business / MSME Entrepreneur</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="userCaste" id="lblCaste">Social Category / Quota</label>
+          <select id="userCaste" class="form-control" required>
+            <option value="General">General Category</option>
+            <option value="OBC">OBC (Other Backward Class)</option>
+            <option value="SC">SC (Scheduled Caste)</option>
+            <option value="ST">ST (Scheduled Tribe)</option>
+            <option value="EWS">EWS (Economically Weaker Section)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="userIncome" id="lblIncome">Annual Family Income</label>
+          <select id="userIncome" class="form-control" required>
+            <option value="150000">Below ₹1.5 Lakhs / year</option>
+            <option value="250000">₹1.5 Lakhs - ₹2.5 Lakhs / year</option>
+            <option value="800000">₹2.5 Lakhs - ₹8.0 Lakhs / year</option>
+            <option value="9999999">Above ₹8.0 Lakhs / year</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="saveProfileBtn">Save Preferences & Match Schemes 🎯</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Citizen Grievance & Feedback Modal -->
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal-window eligibility-modal-box">
+      <button class="close-btn" onclick="closeFeedbackModal()">&times;</button>
+      <h2 id="feedbackModalTitle">Citizen Grievance & Feedback</h2>
+      <p class="modal-subtext" id="feedbackModalSub">Report a broken link, request support, or share portal feedback.</p>
+      
+      <form id="citizenFeedbackForm" novalidate>
+        <div class="form-group">
+          <label for="fbType" id="lblType">Submission Type <span style="color: var(--danger);">*</span></label>
+          <select id="fbType" class="form-control" required>
+            <option value="Feedback">General Feedback / Suggestion</option>
+            <option value="Report Issue">Report Inaccurate Info / Broken Link</option>
+            <option value="Scheme Request">Request Missing Government Scheme</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fbName" id="lblName">Your Name <span style="color: var(--danger);">*</span></label>
+          <input type="text" id="fbName" class="form-control" placeholder="e.g. Ramesh K" required>
+          <small id="nameError" style="color: var(--danger); display: none; margin-top: 4px; font-size: 0.82rem;">Please enter your full name.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="fbEmail" id="lblEmail">Contact Email <span style="color: var(--danger);">*</span></label>
+          <input type="email" id="fbEmail" class="form-control" placeholder="ramesh@example.com" required>
+          <small id="emailError" style="color: var(--danger); display: none; margin-top: 4px; font-size: 0.82rem;">Please enter a valid email address (e.g. name@domain.com).</small>
+        </div>
+
+        <div class="form-group">
+          <label for="fbSchemeSelect" id="lblScheme">Select Scheme Involved <span style="color: var(--danger);">*</span></label>
+          <select id="fbSchemeSelect" class="form-control" required>
+            <option value="">-- Choose a Scheme --</option>
+            <option value="General Portal Feedback">General / Entire Portal (Not Scheme-Specific)</option>
+          </select>
+          <small id="schemeError" style="color: var(--danger); display: none; margin-top: 4px; font-size: 0.82rem;">Please select a scheme or General Portal Feedback.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="fbMessage" id="lblMessage">Reason / Details <span style="color: var(--danger);">*</span></label>
+          <textarea id="fbMessage" class="form-control" rows="3" placeholder="Explain the grievance, inaccurate link, or suggestion in detail..." required></textarea>
+          <small id="reasonError" style="color: var(--danger); display: none; margin-top: 4px; font-size: 0.82rem;">Please describe the reason or grievance details.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submitFeedbackBtn">Submit to Portal Admin 📤</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Scheme Details Modal -->
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal-window">
+      <button class="close-btn" onclick="closeDetailsModal()">&times;</button>
+      <div id="detailsContent"></div>
+    </div>
+  </div>
+
+  <!-- Scripts Loaded in Order -->
+  <script src="js/translations.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

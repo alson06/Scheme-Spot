@@ -1,0 +1,50 @@
+/* Pleasant Soft Civic Theme Background */
+#bubbleCanvas {
+  display: none; /* Completely disable flying bubbles */
+}
+
+/* Subtle, Soft Ambient Radial Glows */
+.ambient-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(circle at 10% 15%, rgba(224, 242, 254, 0.7), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(254, 243, 199, 0.6), transparent 35%),
+    radial-gradient(circle at 85% 85%, rgba(220, 252, 231, 0.6), transparent 35%),
+    radial-gradient(circle at 15% 85%, rgba(243, 232, 255, 0.5), transparent 40%);
+}
+
+/* Subtle Civic Grid Lines */
+.civic-grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Centered Soft Emblem Watermark */
+.civic-watermark-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 580px;
+  height: 580px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.civic-watermark-svg {
+  width: 100%;
+  height: 100%;
+}
